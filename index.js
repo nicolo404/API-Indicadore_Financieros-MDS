@@ -1,3 +1,4 @@
+const {conexionDB} = require('./database/db-mongoDB');  
 const express = require('express');
 const app = express();
 const port = 3000;
@@ -13,9 +14,13 @@ const myLogger = function (req, res, next) {
     res.send('Hello World!')
   })
 
+// iniciar servidor
 app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`);
+    console.log(`listening at http://localhost:${port}`);
 });
+
+// conectar a la base de datos
+conexionDB();
 
 
 
