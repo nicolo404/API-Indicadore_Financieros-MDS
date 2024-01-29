@@ -4,12 +4,24 @@ dotenv.config();
 
 // Middleware que realiza una solicitud GET a otra ruta
 const obtenerDolaresAnual = async (req, res, next) => {
-    try {
-      // Realizar una solicitud GET 
-      const response = await axios.get(`https://api.sbif.cl/api-sbifv3/recursos_api/dolar/2023?apikey=${process.env.API_KEY}&formato=json`);
-        // Guardar la informacion obtenida en el objeto req
-      req.informacionObtenida = response.data;
+    // Obtener el año de la carga 
+    const { añoCarga } = req.body;
+    console.log(añoCarga);
+    //obtener el indicador de la carga
+    const { indicadoresCarga } = req.body;
+    //largo del arreglo de indicadores  de la carga
+    const largoIndicadores = indicadoresCarga.length;
   
+    try {
+      // Realizar una solicitud GET por cada indicador de la carga
+      let indicadores = [];
+        for (let i = 0; i < largoIndicadores; i++) {
+
+        const respuesta = await axios.get(`https://api.sbif.cl/api-sbifv3/recursos_api/${indicadoresCarga[i].toLowerCase()}/${añoCarga}?apikey=${process.env.API_KEY}&formato=json`);
+        // Guardar la respuesta en el objeto req
+        indicadores.push(respuesta.data);
+        }
+        req.informacionObtenida = indicadores;
       next();
     } catch (error) {
       next(error);
