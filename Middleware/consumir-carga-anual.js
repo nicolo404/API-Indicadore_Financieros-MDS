@@ -14,6 +14,9 @@ const obtenerDolaresAnual = async (req, res, next) => {
   
     try {
       // Realizar una solicitud GET por cada indicador de la carga
+      // mensaje miestras se extrae la informacion
+      console.log("Extrayendo informacion");
+
       let indicadores = [];
         for (let i = 0; i < largoIndicadores; i++) {
 
@@ -21,6 +24,7 @@ const obtenerDolaresAnual = async (req, res, next) => {
         // Guardar la respuesta en el objeto req
         indicadores.push(respuesta.data);
         }
+        console.log("Informacion obtenida");
         req.informacionObtenida = indicadores;
       next();
     } catch (error) {
