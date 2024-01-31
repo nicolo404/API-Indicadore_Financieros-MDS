@@ -29,10 +29,3 @@ getConnection().then(() => {
   }).catch((error) => {
     console.error('Error al conectar a la base de datos:', error);
   });
-
-  //mostrar las tablas de la base de datos
-getTables().then((tables) => {
-    console.log('Tablas de la base de datos:', tables);
-  }).catch((error) => {
-    console.error('Error al obtener las tablas de la base de datos:', error);
-  });

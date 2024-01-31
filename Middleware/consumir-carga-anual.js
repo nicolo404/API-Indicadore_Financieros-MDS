@@ -3,7 +3,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 // Middleware que realiza una solicitud GET a otra ruta
-const obtenerDolaresAnual = async (req, res, next) => {
+const obtenerCargaAnual = async (req, res, next) => {
     // Obtener el año de la carga 
     const { añoCarga } = req.body;
     console.log(añoCarga);
@@ -32,4 +32,4 @@ const obtenerDolaresAnual = async (req, res, next) => {
     }
   };
 
-    module.exports = { obtenerDolaresAnual };
+    module.exports = { obtenerCargaAnual };
