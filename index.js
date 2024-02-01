@@ -1,7 +1,8 @@
 const {conexionDB} = require('./database/db-mongoDB'); 
 const express = require('express');
 const routeCargaAnual = require('./Routes/Route-carga'); 
-const {getConnection, getTables} = require('./database/db_sql');
+const {getConnection} = require('./database/db_sql');
+const {loginSap,obtenerCargaPendiente} = require('./ServicesSAP/CargaDiaria_sap');
 const app = express();
 const port = 3000;
 const cors = require('cors');
@@ -29,3 +30,9 @@ getConnection().then(() => {
   }).catch((error) => {
     console.error('Error al conectar a la base de datos:', error);
   });
+
+  // Iniciar sesión y realizar la operación POST
+console.log('Iniciando sesión y realizando la operación POST...');
+loginSap()
+
+

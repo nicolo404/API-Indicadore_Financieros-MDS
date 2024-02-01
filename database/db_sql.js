@@ -15,7 +15,6 @@ const pool = mysql.createPool({
   connectTimeout: 20000, // Ajusta según tus necesidades
 });
 
-
 const getConnection = () => {
   return new Promise((resolve, reject) => {
     pool.getConnection((err, connection) => {

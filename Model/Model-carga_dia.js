@@ -35,6 +35,29 @@ class Tbl_ValoresDiarios {
     });
   }
 
+  
+  getCargasDiaEstadoPendiente(callback) {
+    getConnection().then((connection) => {
+      connection.query('SELECT * FROM SAP WHERE Estado = "Pendiente"', (err, result) => {
+        connection.release();
+        callback(err, result);
+      });
+    }).catch((error) => {
+      callback(error, null);
+    });
+  }
+
+  setEstadoCargaDia(id, estado, callback) {
+    getConnection().then((connection) => {
+      connection.query('UPDATE SAP SET Estado = ? WHERE id_SAP = ?', [estado, id], (err, result) => {
+        connection.release();
+        callback(err, result);
+      });
+    }).catch((error) => {
+      callback(error, null);
+    });
+  }
+
   findByFechaAndTipoIndicador(fecha, tipoIndicador, callback) {
     getConnection().then((connection) => {
       connection.query('SELECT * FROM ValoresDiarios WHERE Fecha = ? AND TipoIndicador = ?', [fecha, tipoIndicador], (err, result) => {
@@ -45,7 +68,6 @@ class Tbl_ValoresDiarios {
       callback(error, null);
     });
   }
-
 }  
 
 module.exports = new Tbl_ValoresDiarios();

@@ -33,16 +33,19 @@ class Controller_carga_dia_sql {
                         }
                     });
                 });
-
+                //crear SAP
+                const nuevoSAP = {
+                    Fecha: cargaDia.Fecha,
+                    Estado: 'Pendiente',
+                };
                 // Guardar en la tabla SAP
                 await new Promise((resolve, reject) => {
                     Tbl_ValoresDiarios.createSAP(nuevoSAP, (err, result) => {
                         if (err) {
+                            console.log("Error al Guardar SAP ")
                             console.error(err);
-                            console.log("Error al crear SAP: ")
                             reject(err);
                         } else {
-                            console.log("SAP creado: ")
                             resolve(result);
                         }
                     });
@@ -51,6 +54,7 @@ class Controller_carga_dia_sql {
                 const ultimoID_SAP = await new Promise((resolve, reject) => {
                     Tbl_ValoresDiarios.ultimoID_SAP((err, result) => {
                         if (err) {
+                            console.log("Error al obtener ultimo ID_SAP")
                             console.error(err);
                             reject(err);
                         } else {
@@ -64,17 +68,15 @@ class Controller_carga_dia_sql {
                 await new Promise((resolve, reject) => {
                     Tbl_ValoresDiarios.create(cargaDia, (err, result) => {
                         if (err) {
+                            console.log("Error al Guardar Carga Dia ")
                             console.error(err);
-                            console.log("Error al crear cargaDia: ")
                             reject(err);
                         } else {
-                            console.log("CargaDia creado: ")
                             resolve(result);
                         }
                     });
                 });
             }
-
             res.status(201).json({
                 mensaje: 'Datos Diarios guardados en Maria DB exitosamente',
             });
@@ -85,6 +87,49 @@ class Controller_carga_dia_sql {
             });
         }
     }
+
+    async getALLCargaDiaPendiente(req, res) {
+        try {
+            const cargasDia = await new Promise((resolve, reject) => {
+                Tbl_ValoresDiarios.getCargasDiaEstadoPendiente((err, result) => {
+                    if (err) {
+                        console.error(err);
+                        reject(err);
+                    } else {
+                        resolve(result);
+                    }
+                });
+            });
+            res.status(200).json({
+                mensaje: 'Cargas Diarias Pendientes obtenidas exitosamente',
+                cargasDia
+            });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({
+                mensaje: 'Error al obtener las cargas diarias pendientes',
+            });
+        }
+    }
+
+    updateEstadoCargaDia(req, res) {
+        const { id } = req.params;
+        const { Estado } = req.body;
+        Tbl_ValoresDiarios.setEstadoCargaDia(id, Estado, (err, result) => {
+            if (err) {
+                console.error(err);
+                res.status(500).json({
+                    mensaje: 'Error al actualizar el estado de la carga diaria',
+                });
+            } else {
+                res.status(200).json({
+                    mensaje: 'Estado de la carga diaria actualizado exitosamente',
+                    result
+                });
+            }
+        });
+    }
+    
 }
 
 module.exports = new Controller_carga_dia_sql();
