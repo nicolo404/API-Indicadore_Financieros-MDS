@@ -87,7 +87,6 @@ class Controller_carga_dia_sql {
             });
         }
     }
-
     async getALLCargaDiaPendiente(req, res) {
         try {
             const cargasDia = await new Promise((resolve, reject) => {
@@ -128,8 +127,7 @@ class Controller_carga_dia_sql {
                 });
             }
         });
-    }
-    
+    }  
 }
 
 module.exports = new Controller_carga_dia_sql();

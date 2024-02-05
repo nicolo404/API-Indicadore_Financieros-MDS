@@ -2,7 +2,7 @@ const {conexionDB} = require('./database/db-mongoDB');
 const express = require('express');
 const routeCargaAnual = require('./Routes/Route-carga'); 
 const {getConnection} = require('./database/db_sql');
-const {loginSap,obtenerCargaPendiente} = require('./ServicesSAP/CargaDiaria_sap');
+const {loginSap,obtenerCargasPendientes, verificarIndicadorSAP} = require('./ServicesSAP/CargaDiaria_sap');
 const app = express();
 const port = 3000;
 const cors = require('cors');
@@ -33,6 +33,10 @@ getConnection().then(() => {
 
   // Iniciar sesión y realizar la operación POST
 console.log('Iniciando sesión y realizando la operación POST...');
-loginSap()
 
-
+loginSap().then(() => {
+  verificarIndicadorSAP();
+}
+).catch((error) => {
+  console.error('Error al iniciar sesión y realizar la operación POST:', error);
+});

@@ -35,10 +35,9 @@ class Tbl_ValoresDiarios {
     });
   }
 
-  
   getCargasDiaEstadoPendiente(callback) {
     getConnection().then((connection) => {
-      connection.query('SELECT * FROM SAP WHERE Estado = "Pendiente"', (err, result) => {
+      connection.query('SELECT * FROM ValoresDiarios V, SAP S WHERE S.Estado = "Pendiente" AND V.id_SAP = S.id_SAP', (err, result) => {
         connection.release();
         callback(err, result);
       });
@@ -46,7 +45,6 @@ class Tbl_ValoresDiarios {
       callback(error, null);
     });
   }
-
   setEstadoCargaDia(id, estado, callback) {
     getConnection().then((connection) => {
       connection.query('UPDATE SAP SET Estado = ? WHERE id_SAP = ?', [estado, id], (err, result) => {
@@ -69,5 +67,4 @@ class Tbl_ValoresDiarios {
     });
   }
 }  
-
 module.exports = new Tbl_ValoresDiarios();
