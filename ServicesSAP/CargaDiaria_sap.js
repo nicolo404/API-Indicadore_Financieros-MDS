@@ -25,6 +25,7 @@ const loginSap = async () => {
         // Realizar la solicitud POST con las cookies en el encabezado
         // Ahora puedes continuar con el resto de tu lógica después de obtener la lista
         // verificarIndicadorSAP(cookies);
+        console.log("Inicio de sesión exitoso");
     } catch (error) {
         console.log("Error al realizar la solicitud POST para iniciar sesión");
         console.error("Error:", error.message);
@@ -34,8 +35,6 @@ const loginSap = async () => {
 // Función para realizar la solicitud POST para verificar el indicador
 const verificarIndicadorSAP = async () => {
     // Traer los valores diarios pendientes
-    console.log("Valores Diarios Pendientes");
-    
     try {
         const endpointVerificar = 'https://mds-thno-s014:50000/b1s/v1/SBOBobService_GetCurrencyRate';
         const cargasPendientes = await obtenerCargasPendientes();
@@ -47,7 +46,7 @@ const verificarIndicadorSAP = async () => {
             // formatear la fecha a formato SAP y el indicador a formato SAP
             const fechaSAP = fechaFormatoSAP(fecha);
             const tipoIndicadorSAP = monedaFormatoSAP(tipoIndicador);
-            const valorSAP = valorMonedaFormatoSAP(valor);
+            const idSAP = cargasPendientes[i].id_SAP;
             // Crear el JSON con la información del indicador
             const postData = {
                 Currency: tipoIndicadorSAP,
@@ -64,16 +63,19 @@ const verificarIndicadorSAP = async () => {
                 // Manejar la respuesta de la operación POST
                 console.log(`${postData.Currency} en la fecha ${postData.Date} existe en la base de datos:`);
                 console.log(response.data);
-            })
+            }) 
             .catch(error => {
                 console.error("Error en la operación POST de verificar:");
-                if(error.response.status == 400 && error.response.data.error.message.value == "Update the exchange rate"){
+                console.log(error.response.status);
+                console.log(error.response.data.error.message.value);
+                if(error.response.status == 400 && (error.response.data.error.message.value == "Update the exchange rate" || error.response.data.error.message.value == "Invalid currency")){
                     console.log("indicador: "+tipoIndicadorSAP+" no existe en la fecha: "+fechaSAP);
                     //insertar valor, fecha y moneda en la tabla SAP
                     //
                     //antes de insertar cambiar formato de la moneda 
-                    const valorSAP = valorMonedaFormatoSAP(valor);
-                    insertarMonedasSAP(tipoIndicadorSAP,fechaSAP,valorSAP);
+                    
+                    insertarMonedasSAP(tipoIndicadorSAP,fechaSAP,valor, idSAP);
+
                 }
             });
         }
@@ -88,7 +90,13 @@ const obtenerCargasPendientes = async () => {
                 if (err) {
                     console.error(err);
                     reject(err);
-                } else {
+                }
+                if(result.length == 0){
+                    console.log("No hay cargas pendientes");
+                    resolve(result);
+                }
+                else {
+                    console.log("Cargas Pendientes: "+result.length);
                     resolve(result);   
                 }
             });
@@ -101,7 +109,7 @@ const obtenerCargasPendientes = async () => {
     }
 };
     // Funcion para realizar el post de insertar monedas en la tabla SAP de donde me logie
-const insertarMonedasSAP = (tipoMoneda,fecha,valor) => {
+const insertarMonedasSAP = (tipoMoneda,fecha,valor, idSAP) => {
     // crear el json con la informacion de la moneda
         const postData = {
             Currency: tipoMoneda,
@@ -121,10 +129,18 @@ const insertarMonedasSAP = (tipoMoneda,fecha,valor) => {
                 // Manejar la respuesta de la operación POST
                 console.log("Respuesta de la operación POST Insertar exitosa:");
                 console.log(response.data);
+            }).then(() => {
+                //actualizar estado de la carga
+                Tbl_ValoresDiarios.setEstadoCargaDia(idSAP, "Cargado", (err, result) => {
+                    if (err) {
+                        console.error(err);
+                    }
+                });
             })
             .catch(error => {
                 console.error("Error en la operación POST de insertar a SAP:");
-                console.error(error);
+                console.error(error.response.status);
+                console.error(error.response.data.error.message.value);
             });
 }
 
@@ -141,14 +157,15 @@ const monedaFormatoSAP = (moneda) => {
             return 'US$';
         case 'UFs':
             return 'UF';
+        case 'IPCs':
+            return 'IPCS';
+        case 'UTMs':
+            return 'UTMS';
         default:
             return '';
     }
 };
 
-//funcion para cambiar el formate de el valor de la modena de 37.897 a 37897
-const valorMonedaFormatoSAP = (valor) => {
-    return valor.replace('.','');
-};
 
-module.exports = { loginSap, obtenerCargasPendientes, verificarIndicadorSAP};
+
+module.exports = {loginSap, obtenerCargasPendientes, verificarIndicadorSAP};

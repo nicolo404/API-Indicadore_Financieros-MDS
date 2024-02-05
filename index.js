@@ -1,8 +1,11 @@
 const {conexionDB} = require('./database/db-mongoDB'); 
 const express = require('express');
-const routeCargaAnual = require('./Routes/Route-carga'); 
+const routeCarga = require('./Routes/Route-carga'); 
 const {getConnection} = require('./database/db_sql');
-const {loginSap,obtenerCargasPendientes, verificarIndicadorSAP} = require('./ServicesSAP/CargaDiaria_sap');
+const {loginSap, verificarIndicadorSAP} = require('./ServicesSAP/CargaDiaria_sap');
+const { obtenerCargaDia } = require('./Middleware/consumir-carga-dia');
+const {postCargaDia} = require('./Controller/Controller_carga');
+const cron = require('node-cron'); 
 const app = express();
 const port = 3000;
 const cors = require('cors');
@@ -16,9 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 //configurar el cors
 app.use(cors());
 // routes
-app.use("/api",routeCargaAnual);
-//conectar a mongoDB
-//conexionDB();
+app.use("/api", routeCarga);
 
 //conectar a MariaDB
 
@@ -31,12 +32,16 @@ getConnection().then(() => {
     console.error('Error al conectar a la base de datos:', error);
   });
 
-  // Iniciar sesión y realizar la operación POST
-console.log('Iniciando sesión y realizando la operación POST...');
+//hacer await login en sap cada 25 minutos y luego verificar cada 10 segundos si hay indicadores pendientes
+cron.schedule('*/10 * * * * *', async () => {
+    console.log('Verificar indicadores pendientes');
+    await loginSap();
+    await verificarIndicadorSAP();
+  });
 
-loginSap().then(() => {
-  verificarIndicadorSAP();
-}
-).catch((error) => {
-  console.error('Error al iniciar sesión y realizar la operación POST:', error);
-});
+
+  
+  
+
+  
+ 

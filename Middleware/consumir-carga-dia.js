@@ -6,10 +6,14 @@ dotenv.config();
 const obtenerCargaDia = async (req, res, next) => {
         //obtener indicadores de la carga
         //obtener el indicador de la carga
-    const { indicadoresCarga } = req.body;
+    const { indicadoresCarga } = req.body || {
+      "indicadoresCarga":[
+          "DolaR","uF","EuRO","ipc","utm"
+      ]
+  };
     try {
       // Realizar una solicitud GET por cada indicador de la carga
-      // mensaje miestras se extrae la informacion        
+      // mensaje miestras se extrae la informacion       
       let indicadores = [];  
       for (let i = 0; i < indicadoresCarga.length; i++) {
             const respuesta = await axios.get(`https://api.sbif.cl/api-sbifv3/recursos_api/${indicadoresCarga[i].toLowerCase()}?apikey=${process.env.API_KEY}&formato=json`);

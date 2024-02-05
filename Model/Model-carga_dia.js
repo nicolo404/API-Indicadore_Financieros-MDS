@@ -9,6 +9,9 @@ class Tbl_ValoresDiarios {
         callback(err, result);
       });
     }).catch((error) => {
+      if (error.connection) {
+        error.connection.release();
+      }
       callback(error, null);
     });
   }
@@ -20,6 +23,9 @@ class Tbl_ValoresDiarios {
         callback(err, result);
       });
     }).catch((error) => {
+      if (error.connection) {
+        error.connection.release();
+      }
       callback(error, null);
     });
   }
@@ -31,6 +37,9 @@ class Tbl_ValoresDiarios {
         callback(err, result);
       });
     }).catch((error) => {
+      if (error.connection) {
+        error.connection.release();
+      }
       callback(error, null);
     });
   }
@@ -42,6 +51,9 @@ class Tbl_ValoresDiarios {
         callback(err, result);
       });
     }).catch((error) => {
+      if (error.connection) {
+        error.connection.release();
+      }
       callback(error, null);
     });
   }
@@ -52,6 +64,9 @@ class Tbl_ValoresDiarios {
         callback(err, result);
       });
     }).catch((error) => {
+      if (error.connection) {
+        error.connection.release();
+      }
       callback(error, null);
     });
   }
@@ -63,6 +78,9 @@ class Tbl_ValoresDiarios {
         callback(err, result);
       });
     }).catch((error) => {
+      if (error.connection) {
+        error.connection.release();
+      }
       callback(error, null);
     });
   }

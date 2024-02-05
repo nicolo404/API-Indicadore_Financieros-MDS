@@ -1,8 +1,11 @@
 const Tbl_ValoresDiarios = require('../Model/Model-carga_dia');
-
 class Controller_carga_dia_sql {
     async postCargaDia(req, res) {
-        const { indicadoresCarga } = req.body;
+        const { indicadoresCarga } = req.body || {
+            "indicadoresCarga":[
+                "DolaR","uF","EuRO","ipc","utm"
+            ]
+        };
         try {
             // Recorrer el arreglo de indicadores
             for (let i = 0; i < indicadoresCarga.length; i++) {
@@ -11,7 +14,7 @@ class Controller_carga_dia_sql {
                 const cargaDia = {
                     Fecha: req.informacionObtenida[i][nombreJson][0].Fecha,
                     TipoIndicador: nombreJson,
-                    ValorIndicador: parseFloat(req.informacionObtenida[i][nombreJson][0].Valor.replace('.', '')),
+                    ValorIndicador: req.informacionObtenida[i][nombreJson][0].Valor,
                     id_SAP:null
                 };
                 // Validar que cargaDia no exista en la base de datos
@@ -22,7 +25,7 @@ class Controller_carga_dia_sql {
                             reject(err);
                         } 
                         else if (result.length > 0) {
-                            console.log("ya existe: ");
+                            console.log("ya existe: "+cargaDia.TipoIndicador+" en la fecha: "+cargaDia.Fecha);
                             return res.status(400).json({
                                 mensaje: 'El indicador y fecha ya existe en la base de datos',
                                 result    
@@ -39,6 +42,7 @@ class Controller_carga_dia_sql {
                     Estado: 'Pendiente',
                 };
                 // Guardar en la tabla SAP
+                
                 await new Promise((resolve, reject) => {
                     Tbl_ValoresDiarios.createSAP(nuevoSAP, (err, result) => {
                         if (err) {
@@ -50,6 +54,7 @@ class Controller_carga_dia_sql {
                         }
                     });
                 });
+                
                 // Obtener el ultimo ID_SAP
                 const ultimoID_SAP = await new Promise((resolve, reject) => {
                     Tbl_ValoresDiarios.ultimoID_SAP((err, result) => {
@@ -64,7 +69,7 @@ class Controller_carga_dia_sql {
                 });
                 // Agregar el ultimo ID_SAP al objeto cargaDia
                 cargaDia.id_SAP = ultimoID_SAP[0].ID_SAP;
-                // Guardar en la tabla VAlores Diarios
+                // Guardar en la tabla Valores Diarios
                 await new Promise((resolve, reject) => {
                     Tbl_ValoresDiarios.create(cargaDia, (err, result) => {
                         if (err) {
@@ -87,6 +92,8 @@ class Controller_carga_dia_sql {
             });
         }
     }
+
+
     async getALLCargaDiaPendiente(req, res) {
         try {
             const cargasDia = await new Promise((resolve, reject) => {
