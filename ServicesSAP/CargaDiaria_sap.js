@@ -31,7 +31,6 @@ const loginSap = async () => {
         console.error("Error:", error.message);
     }
 };
-
 // Función para realizar la solicitud POST para verificar el indicador
 const verificarIndicadorSAP = async () => {
     // Traer los valores diarios pendientes
@@ -46,6 +45,7 @@ const verificarIndicadorSAP = async () => {
             // formatear la fecha a formato SAP y el indicador a formato SAP
             const fechaSAP = fechaFormatoSAP(fecha);
             const tipoIndicadorSAP = monedaFormatoSAP(tipoIndicador);
+            const valorSAP = valorFormatoSAP(valor);
             const idSAP = cargasPendientes[i].id_SAP;
             // Crear el JSON con la información del indicador
             const postData = {
@@ -65,20 +65,18 @@ const verificarIndicadorSAP = async () => {
                 console.log(response.data);
             }) 
             .catch(error => {
-                console.error("Error en la operación POST de verificar:");
-                console.log(error.response.status);
-                console.log(error.response.data.error.message.value);
-                if(error.response.status == 400 && (error.response.data.error.message.value == "Update the exchange rate" || error.response.data.error.message.value == "Invalid currency")){
-                    console.log("indicador: "+tipoIndicadorSAP+" no existe en la fecha: "+fechaSAP);
+                if(error.response.data.error.message.value == "Invalid currency"){
+                    console.log("Valores ingresados no son validos para la moneda: ");
+                }
+                if(error.response.status == 400 && error.response.data.error.message.value == "Update the exchange rate"){
+                    console.log("indicador: "+tipoIndicadorSAP+" no existe en la fecha: "+fechaSAP+" en la base de datos de SAP");
                     //insertar valor, fecha y moneda en la tabla SAP
-                    //
                     //antes de insertar cambiar formato de la moneda 
-                    
-                    insertarMonedasSAP(tipoIndicadorSAP,fechaSAP,valor, idSAP);
-
+                    insertarMonedasSAP(tipoIndicadorSAP,fechaSAP,valorSAP, idSAP);
                 }
             });
         }
+        console.log("Carga de datos exitosa");
     } catch (error) {
         console.error("Error al obtener las cargas pendientes:", error);
     }
@@ -101,9 +99,7 @@ const obtenerCargasPendientes = async () => {
                 }
             });
         });
-
         return cargasPendientes;
-
     }catch (error) {
         console.error("Error al obtener las cargas pendientes:", error);
     }
@@ -116,7 +112,6 @@ const insertarMonedasSAP = (tipoMoneda,fecha,valor, idSAP) => {
             RateDate: fecha,
             Rate: valor
         };
-        console.log("Post Data 2")
         console.log(postData);
         // Realizar la solicitud POST para insertar postData en la base de datos
             axios.post('https://mds-thno-s014:50000/b1s/v1/SBOBobService_SetCurrencyRate', postData, {
@@ -148,6 +143,11 @@ const insertarMonedasSAP = (tipoMoneda,fecha,valor, idSAP) => {
 const fechaFormatoSAP = (fecha) => {
     return fecha.toISOString().split('T')[0].replace(/-/g, '');
 };
+// Funcion para pasar de '36.697,42' a '36697.42'
+const valorFormatoSAP = (valor) => {
+    return valor.replace('.', '').replace(',', '.');
+};
+
 // Funcion para pasar de 'Euros' a 'EUR', 'Dolares' a 'US$' y uf a 'UF'
 const monedaFormatoSAP = (moneda) => {
     switch (moneda) {
@@ -158,9 +158,9 @@ const monedaFormatoSAP = (moneda) => {
         case 'UFs':
             return 'UF';
         case 'IPCs':
-            return 'IPCS';
+            return 'ipc';
         case 'UTMs':
-            return 'UTMS';
+            return 'utm';
         default:
             return '';
     }

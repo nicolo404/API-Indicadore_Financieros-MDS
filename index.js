@@ -4,7 +4,7 @@ const routeCarga = require('./Routes/Route-carga');
 const {getConnection} = require('./database/db_sql');
 const {loginSap, verificarIndicadorSAP} = require('./ServicesSAP/CargaDiaria_sap');
 const { obtenerCargaDia } = require('./Middleware/consumir-carga-dia');
-const {postCargaDia} = require('./Controller/Controller_carga');
+const {postCargaDia, executeCargaDia} = require('./Controller/Controller_carga');
 const cron = require('node-cron'); 
 const app = express();
 const port = 3000;
@@ -21,23 +21,47 @@ app.use(cors());
 // routes
 app.use("/api", routeCarga);
 
-//conectar a MariaDB
-
+// Configurar el servidor y conectar a la base de datos
 getConnection().then(() => {
-    // Iniciar el servidor y escuchar peticiones HTTP
-    app.listen(port, () => {
+  // Iniciar el servidor
+  app.listen(port, async () => {
       console.log("Servidor corriendo en el puerto " + port);
-    });
-  }).catch((error) => {
-    console.error('Error al conectar a la base de datos:', error);
   });
+}).catch((error) => {
+  console.error('Error al conectar a la base de datos:', error);
+});
 
-//hacer await login en sap cada 25 minutos y luego verificar cada 10 segundos si hay indicadores pendientes
-cron.schedule('*/10 * * * * *', async () => {
-    console.log('Verificar indicadores pendientes');
-    await loginSap();
-    await verificarIndicadorSAP();
-  });
+cron.schedule('* * * * *', async () => {
+  try {
+      // Ejecutar el método executeCargaDia del controlador
+      await executeCargaDia();
+
+      console.log('Cron job ejecutado con éxito.');
+  } catch (error) {
+      console.error('Error al ejecutar el cron job:', error);
+  }
+});
+
+//ralizar login y verificar indicador SAP cada 1 minuto y medio
+cron.schedule('*/2 * * * *', async () => {
+  try {
+      // Realizar el login en SAP
+      await loginSap();
+      // Verificar el indicador en SAP
+      await verificarIndicadorSAP();
+
+      console.log('Cron job ejecutado con éxito, en servicio sap.');
+  } catch (error) {
+      console.error('Error al ejecutar el cron job:', error);
+  }
+});
+
+
+
+
+
+
+
 
 
   
