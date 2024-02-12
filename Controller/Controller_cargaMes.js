@@ -56,7 +56,6 @@ class ControllerCargaMes {
                             });
                             //asignar el id del sap al json
                             jsonCargaMes.id_SAP = ultimoID_SAP[0].ID_SAP;
-                            console.log(jsonCargaMes);
 
                             Tbl_ValoresMes.create(jsonCargaMes, (err, result) => {
                                 if (err) {

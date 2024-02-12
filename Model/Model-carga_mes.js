@@ -56,6 +56,23 @@ class Tbl_ValoresMes {
         callback(error, null);
         });
     }
+
+    //obtener pendientes por año y mes
+    async getCargasMesEstadoPendiente(year, month, callback) {
+        getConnection().then((connection) => {
+        connection.query('SELECT * FROM ValoresMes V, SAP S WHERE S.Estado = "Pendiente" AND V.id_SAP = S.id_SAP AND YEAR(V.fecha) = ? AND MONTH(V.fecha) = ?', [year, month], (err, result) => {
+            connection.release();
+            callback(err, result);
+        });
+        }).catch((error) => {
+        if (error.connection) {
+            error.connection.release();
+        }
+        callback(error, null);
+        });
+    }
+    
+
     setEstadoCargaDia(id, estado, callback) {
         getConnection().then((connection) => {
         connection.query('UPDATE SAP SET Estado = ? WHERE id_SAP = ?', [estado, id], (err, result) => {
