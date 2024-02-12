@@ -10,7 +10,7 @@ const pool = mysql.createPool({
   database: 'indicadoresFinancieros',
   timezone: 'America/Santiago',
   waitForConnections: true,
-  connectionLimit: 10,
+  connectionLimit: 40,
   queueLimit: 0,
   connectTimeout: 20000, // Ajusta según tus necesidades
 });

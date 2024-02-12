@@ -86,9 +86,6 @@ class Controller_carga_dia_sql {
         }
     }
 
-
-
-
     async postCargaDia(req, res) {
         //aplicar el middleware obtenerCargaDia
         const { indicadoresCarga } = {

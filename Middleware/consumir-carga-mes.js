@@ -16,8 +16,7 @@ const obtenerCargaMes = async (req, res, next) => {
       // mensaje miestras se extrae la informacion       
       let indicadores = [];  
       for (let i = 0; i < indicadoresCarga.length; i++) {
-        console.log("fdasfsa")
-        console.log(`Obteniendo indicador ${indicadoresCarga[i]}...`);
+        console.log("Obteniendo información de: "+indicadoresCarga[i]+"...")
             const respuesta = await axios.get(`https://api.sbif.cl/api-sbifv3/recursos_api/${indicadoresCarga[i].toLowerCase()}/${añoCarga}/${mesCarga}?apikey=${process.env.API_KEY}&formato=json`);   
             // Guardar la respuesta en el objeto req
             indicadores.push(respuesta.data);

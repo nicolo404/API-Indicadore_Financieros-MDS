@@ -42,19 +42,8 @@ cron.schedule('* * * * *', async () => {
   }
 });
 
-//ralizar login y verificar indicador SAP cada 1 minuto y medio
-cron.schedule('*/2 * * * *', async () => {
-  try {
-      // Realizar el login en SAP
-      await loginSap();
-      // Verificar el indicador en SAP
-      await verificarIndicadorSAP();
 
-      console.log('Cron job ejecutado con éxito, en servicio sap.');
-  } catch (error) {
-      console.error('Error al ejecutar el cron job:', error);
-  }
-});
+
 
 
 
