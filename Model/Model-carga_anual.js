@@ -45,7 +45,7 @@ class Tbl_ValoresAnual{
     //obtener pendientes por año en particular
     getCargasAnualEstadoPendiente(año, callback) {
         getConnection().then((connection) => {
-        connection.query('SELECT * FROM ValoresAnual V, SAP S WHERE S.Estado = "Pendiente" AND V.id_SAP = S.id_SAP AND V.Año = ?', año, (err, result) => {
+        connection.query('SELECT * FROM ValoresAnual V, SAP S WHERE S.Estado = "Pendiente" AND V.id_SAP = S.id_SAP AND YEAR(V.fecha) = ?', año, (err, result) => {
             connection.release();
             callback(err, result);
         });
@@ -57,7 +57,7 @@ class Tbl_ValoresAnual{
         });
     }
 
-    setEstadoCargaaAnual(idSAP, estado, callback) {
+    setEstadoCargaAnual(idSAP, estado, callback) {
         getConnection().then((connection) => {
         connection.query('UPDATE SAP SET Estado = ? WHERE ID_SAP = ?', [estado, idSAP], (err, result) => {
             connection.release();
