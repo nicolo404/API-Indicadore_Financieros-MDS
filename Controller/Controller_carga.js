@@ -204,7 +204,6 @@ class Controller_carga_dia_sql {
             });
         }
     }
-
     updateEstadoCargaDia(req, res) {
         const { id } = req.params;
         const { Estado } = req.body;
