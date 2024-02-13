@@ -122,8 +122,7 @@ const insertarMonedasSAP = (tipoMoneda,fecha,valor, idSAP) => {
             })
             .then(response => {
                 // Manejar la respuesta de la operación POST
-                console.log("Respuesta de la operación POST Insertar exitosa:");
-                console.log(response.data);
+                
             }).then(() => {
                 //actualizar estado de la carga
                 Tbl_ValoresDiarios.setEstadoCargaDia(idSAP, "Cargado", (err, result) => {
@@ -165,7 +164,4 @@ const monedaFormatoSAP = (moneda) => {
             return '';
     }
 };
-
-
-
 module.exports = {loginSap, obtenerCargasPendientes, verificarIndicadorSAP};

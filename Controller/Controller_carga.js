@@ -10,7 +10,6 @@ class Controller_carga_dia_sql {
         console.log("Informacion obtenida: " + JSON.stringify(informacionObtenida, null, 2));
         try {
             // Recorrer el arreglo de indicadores
-            console.log("Extrayendo informacion");
             for (let i = 0; i < indicadoresCarga.length; i++) {
                 const nombreJson = Object.keys(informacionObtenida[i])[0];
                 // Crear Json con la informacion obtenida
@@ -62,7 +61,6 @@ class Controller_carga_dia_sql {
                                     }
                                 });
                             });
-                            console.log("Ultimo ID_SAP: " + ultimoID_SAP[0].ID_SAP);
                             // Agregar el ultimo ID_SAP al objeto cargaDia                    
                             cargaDia.id_SAP = ultimoID_SAP[0].ID_SAP;
 
@@ -79,7 +77,7 @@ class Controller_carga_dia_sql {
                     });
                 });
             }
-            console.log('Datos Diarios guardados en Maria DB exitosamente');
+            console.log('Datos Diarios guardados en Maria DB exitosamente 📂');
         } catch (error) {
             console.error(error);
             throw error;
