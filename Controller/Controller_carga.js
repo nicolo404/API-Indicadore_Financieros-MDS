@@ -7,7 +7,6 @@ class Controller_carga_dia_sql {
             "indicadoresCarga": ["DolaR", "uF", "EuRO"]
         };
         const informacionObtenida = await obtenerCargaDia();
-        console.log("Informacion obtenida: " + JSON.stringify(informacionObtenida, null, 2));
         try {
             // Recorrer el arreglo de indicadores
             for (let i = 0; i < indicadoresCarga.length; i++) {
@@ -63,7 +62,7 @@ class Controller_carga_dia_sql {
                             });
                             // Agregar el ultimo ID_SAP al objeto cargaDia                    
                             cargaDia.id_SAP = ultimoID_SAP[0].ID_SAP;
-
+                            console.log("Agregando: "+ cargaDia.TipoIndicador + " en la fecha: " + cargaDia.Fecha);
                             Tbl_ValoresDiarios.create(cargaDia, (err, result) => {
                                 if (err) {
                                     console.log("Error al Guardar Carga Dia ")
