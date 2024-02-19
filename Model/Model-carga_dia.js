@@ -46,7 +46,7 @@ class Tbl_ValoresDiarios {
 
   getCargasDiaEstadoPendiente(callback) {
     getConnection().then((connection) => {
-      connection.query('SELECT * FROM ValoresDiarios V, SAP S WHERE S.Estado = "Pendiente" AND V.id_SAP = S.id_SAP', (err, result) => {
+      connection.query('SELECT * FROM ValoresMes V, SAP S WHERE S.Estado = "Pendiente" AND V.id_SAP = S.id_SAP', (err, result) => {
         connection.release();
         callback(err, result);
       });

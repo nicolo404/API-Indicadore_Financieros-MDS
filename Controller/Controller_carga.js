@@ -18,8 +18,7 @@ class Controller_carga_dia_sql {
                     ValorIndicador: informacionObtenida[i][nombreJson][0].Valor,
                     id_SAP: null
                 };
-
-                // Validar que cargaDia no exista en la base de datos
+                // Validar que cargaDia no exista en la base de datos local
                 await new Promise((resolve, reject) => {
                     Tbl_ValoresDiarios.findByFechaAndTipoIndicador(cargaDia.Fecha, cargaDia.TipoIndicador, async (err, result) => {
                         if (err) {
@@ -35,7 +34,6 @@ class Controller_carga_dia_sql {
                                 Fecha: cargaDia.Fecha,
                                 Estado: 'Pendiente',
                             };
-
                             // Guardar en la tabla SAP
                             await new Promise((resolve, reject) => {
                                 Tbl_ValoresDiarios.createSAP(nuevoSAP, (err, result) => {
@@ -48,7 +46,6 @@ class Controller_carga_dia_sql {
                                     }
                                 })
                             });
-
                             const ultimoID_SAP = await new Promise((resolve, reject) => {
                                 Tbl_ValoresDiarios.ultimoID_SAP(async (err, result) => {
                                     if (err) {
@@ -82,7 +79,6 @@ class Controller_carga_dia_sql {
             throw error;
         }
     }
-
     async postCargaDia(req, res) {
         //aplicar el middleware obtenerCargaDia
         const { indicadoresCarga } = {
@@ -147,8 +143,7 @@ class Controller_carga_dia_sql {
                             }
                         });
                     });
-                    console.log("Ultimo ID_SAP: "+ultimoID_SAP[0].ID_SAP); 
-                    console.log("fdsaf")                   
+                    console.log("Ultimo ID_SAP: "+ultimoID_SAP[0].ID_SAP);                 
                     //Agregar el ultimo ID_SAP al objeto cargaDia                    
                     cargaDia.id_SAP = ultimoID_SAP[0].ID_SAP;
                    

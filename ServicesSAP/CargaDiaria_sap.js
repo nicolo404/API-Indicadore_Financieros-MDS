@@ -25,7 +25,7 @@ const loginSap = async () => {
         // Realizar la solicitud POST con las cookies en el encabezado
         // Ahora puedes continuar con el resto de tu lógica después de obtener la lista
         // verificarIndicadorSAP(cookies);
-        console.log("Inicio de sesión exitoso");
+        console.log("Inicio de sesión exitoso"); 
     } catch (error) {
         console.log("Error al realizar la solicitud POST para iniciar sesión");
         console.error("Error:", error.message);

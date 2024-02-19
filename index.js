@@ -3,8 +3,7 @@ const express = require('express');
 const routeCarga = require('./Routes/Route-carga'); 
 const {getConnection} = require('./database/db_sql');
 const {loginSap, verificarIndicadorSAP} = require('./ServicesSAP/CargaDiaria_sap');
-const { obtenerCargaDia } = require('./Middleware/consumir-carga-dia');
-const {postCargaDia, executeCargaDia} = require('./Controller/Controller_carga');
+const {executeCargaDia} = require('./Controller/Controller_carga');
 const cron = require('node-cron'); 
 const app = express();
 const port = 3000;
@@ -31,42 +30,24 @@ getConnection().then(() => {
   console.error('Error al conectar a la base de datos:', error);
 });
 
-
 cron.schedule('* * * * *', async () => {
   try {
       // Ejecutar el método executeCargaDia del controlador
       await executeCargaDia();
 
-      console.log('Cron job  para cargar datos diarios ejecutado con éxito.');
+      console.log('Cron job ejecutado con éxito.');
   } catch (error) {
       console.error('Error al ejecutar el cron job:', error);
   }
 });
-
-
 
 cron.schedule('*/2 * * * *', async () => {
   try {
       // Realizar el login en SAP
-      await loginSap();
-      // Verificar el indicador en SAP
-      await verificarIndicadorSAP();
-
-      console.log('Cron job ejecutado con éxito, en servicio sap.');
+      await loginSap().then(() => {
+        verificarIndicadorSAP()
+      });
   } catch (error) {
       console.error('Error al ejecutar el cron job:', error);
   }
 });
-
-
-
-
-
-
-
-
-  
-  
-
-  
- 
