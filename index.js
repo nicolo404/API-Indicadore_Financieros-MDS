@@ -30,24 +30,6 @@ getConnection().then(() => {
   console.error('Error al conectar a la base de datos:', error);
 });
 
-cron.schedule('* * * * *', async () => {
-  try {
-      // Ejecutar el método executeCargaDia del controlador
-      await executeCargaDia();
 
-      console.log('Cron job ejecutado con éxito.');
-  } catch (error) {
-      console.error('Error al ejecutar el cron job:', error);
-  }
-});
 
-cron.schedule('*/2 * * * *', async () => {
-  try {
-      // Realizar el login en SAP
-      await loginSap().then(() => {
-        verificarIndicadorSAP()
-      });
-  } catch (error) {
-      console.error('Error al ejecutar el cron job:', error);
-  }
-});
+

@@ -1,21 +1,16 @@
-const Tbl_ValoresMes = require('../Model/Model-carga_mes');
+const { json } = require('body-parser');
+const Tbl_ValoresMes = require('../Model/Model-carga_dia');
 
 class ControllerCargaMes {
     async postCargaMes(req, res) { 
     for(let i = 0; i < req.informacionObtenida.length; i++) {
+        console.log("informacion obtenida: ")
+        console.log(req.informacionObtenida[i]);
         const nombreJson = Object.keys(req.informacionObtenida[i])[0];
         //otro for por cada moneda
-        console.log(nombreJson);
-        console.log(req.informacionObtenida[i][nombreJson].length); 
         try {
             for(let j = 0; j < req.informacionObtenida[i][nombreJson].length; j++) { 
                 // crear json con los datos de la moneda
-                const jsonCargaMes = {
-                    Fecha: req.informacionObtenida[i][nombreJson][j].Fecha,
-                    TipoIndicador: nombreJson,
-                    ValorIndicador: req.informacionObtenida[i][nombreJson][j].Valor,
-                    id_SAP: null
-                };
                 //validar si en esa fecha ya existe el indicador
                 await new Promise((resolve, reject) => {
                     Tbl_ValoresMes.findByFechaAndTipoIndicador(jsonCargaMes.Fecha, jsonCargaMes.TipoIndicador, async(err, result) => {
@@ -24,6 +19,10 @@ class ControllerCargaMes {
                             reject(err);
                         }
                         if(result.length == 0){
+                            console.log("No existe el indicador en la fecha: "+jsonCargaMes.Fecha);
+                            console.log("jsonCargaMes: "+jsonCargaMes);
+                            //crear sap por cada
+                            /*
                             console.log("No existe el indicador en la fecha: "+jsonCargaMes.Fecha);
                             //crear sap
                             const nuevoSAP = {
@@ -66,10 +65,8 @@ class ControllerCargaMes {
                                     resolve(result);
                                 }
                             });
-
                             resolve(false);
-                            
-
+                            */
                         }
                         else {
                             console.log("Ya existe el indicador en la fecha: "+jsonCargaMes.Fecha);

@@ -1,12 +1,63 @@
 const axios = require('axios');
 const https = require('https');
 const Tbl_ValoresDiarios = require('../Model/Model-carga_dia');
-// Datos de inicio de sesión en formato JSON
-const loginData = {
-    CompanyDB: "SBOMARINATEST",
-    UserName: "integration",
-    Password: "B1nt3gr4."
+
+const bases_datosGet = async (req,res) => {
+        const base_datos = await new Promise((resolve, reject) => {
+            Tbl_ValoresDiarios.getAllDBSAP((err, result) => {
+                if (err) {
+                    console.error(err);
+                    reject(err);
+                }
+                resolve(result);
+            });
+        });
+      return base_datos;
+}
+//retorna en una ruta las cargas pendientes
+const obtenerCargasPendientes = async (id_db,req,res) => {
+    const cargasPendientes = await new Promise((resolve, reject) => {
+        Tbl_ValoresDiarios.getSAPbyIDDB(id_db, (err, result) => {
+            if (err) {
+                console.error(err);
+                reject(err);
+            }
+            resolve(result);
+    });
+    });
+    return cargasPendientes;
 };
+
+const cargar_SAP = async (req,res) => {
+    //traer las bases de datos de sap de la funcion bases_datosGet
+    const base_datos = await bases_datosGet();
+    //recorrer las bases de datos
+    console.log(base_datos.length)
+    for(let i = 0; i < base_datos.length; i++){
+        const id_db = base_datos[i].id_db;
+        //consultar por pendientes por cada base de datos
+        const cargasPendientesById = await obtenerCargasPendientes(id_db);
+        console.log("cargas pendientes por id "+id_db+" : "+cargasPendientesById.length);
+        
+        // for para crear un json para logearse  por cada id_db
+        for(let j = 0; j < cargasPendientesById.length; j++){
+            const loginData = {
+                CompanyDB: cargasPendientesById[j].NombreDb,
+                UserName: cargasPendientesById[j].UserName,
+                Password: cargasPendientesById[j].Password
+            };
+            console.log(loginData);
+        
+            loginSap(loginData)
+            //URL del endpoint de verificar
+            const verificarEndpoint = '';
+            //verificarIndicadorSAP(cookies, fecha, tipoIndicador,id_db)
+        }
+       
+    }
+}
+
+
 // URL del endpoint de inicio de sesión
 const loginEndpoint = 'https://mds-thno-s014:50000/b1s/v1/Login';
 // Variable para almacenar las cookies
@@ -16,7 +67,7 @@ const axiosConfig = {
     httpsAgent: new https.Agent({ rejectUnauthorized: false }),
 };
 // Función para realizar la solicitud POST para iniciar sesión
-const loginSap = async () => {
+const loginSap = async (loginData) => {
     try {
         // Realizar la solicitud POST para iniciar sesión
         const response = await axios.post(loginEndpoint, loginData, axiosConfig);
@@ -81,29 +132,6 @@ const verificarIndicadorSAP = async () => {
         console.error("Error al obtener las cargas pendientes:", error);
     }
 };
-const obtenerCargasPendientes = async () => {
-    try {
-        const cargasPendientes = await new Promise((resolve, reject) => {
-            Tbl_ValoresDiarios.getCargasDiaEstadoPendiente((err, result) => {
-                if (err) {
-                    console.error(err);
-                    reject(err);
-                }
-                if(result.length == 0){
-                    console.log("No hay cargas pendientes");
-                    resolve(result);
-                }
-                else {
-                    console.log("Cargas Pendientes: "+result.length);
-                    resolve(result);   
-                }
-            });
-        });
-        return cargasPendientes;
-    }catch (error) {
-        console.error("Error al obtener las cargas pendientes:", error);
-    }
-};
     // Funcion para realizar el post de insertar monedas en la tabla SAP de donde me logie
 const insertarMonedasSAP = (tipoMoneda,fecha,valor, idSAP) => {
     // crear el json con la informacion de la moneda
@@ -146,7 +174,6 @@ const fechaFormatoSAP = (fecha) => {
 const valorFormatoSAP = (valor) => {
     return valor.replace('.', '').replace(',', '.');
 };
-
 // Funcion para pasar de 'Euros' a 'EUR', 'Dolares' a 'US$' y uf a 'UF'
 const monedaFormatoSAP = (moneda) => {
     switch (moneda) {
@@ -164,4 +191,4 @@ const monedaFormatoSAP = (moneda) => {
             return '';
     }
 };
-module.exports = {loginSap, obtenerCargasPendientes, verificarIndicadorSAP};
+module.exports = {loginSap, verificarIndicadorSAP,bases_datosGet,obtenerCargasPendientes, cargar_SAP};

@@ -19,5 +19,8 @@ router.put('/v1/cargaDiaActual/:id', tbl_valoresdiariosController.updateEstadoCa
 router.post('/v1/cargaDiaActual/sap', sap.loginSap);
 router.post('/v1/cargaMes/sap', sapMes.loginSap);
 router.post('/v1/cargaAnual/sap', sapAnual.loginSap);
+router.get('/v1/cargaDiaActual/sap/db', sap.bases_datosGet);
+router.get('/v1/cargaDiaActual/sap/db/:id', sap.obtenerCargasPendientes);
+router.post('/v1/cargaDiaActual/sap/cargardatos', sap.cargar_SAP);
 
 module.exports = router;

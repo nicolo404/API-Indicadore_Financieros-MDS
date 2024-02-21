@@ -6,7 +6,7 @@ const pool = mysql.createPool({
   host: "10.200.5.37",
   user: 'usr_financiero',
   password: "?n-mR6%}`S`Qr(et<6",
-  database: 'indicadoresFinancieros',
+  database: 'indicadoresFinQA',
   timezone: 'America/Santiago',
   waitForConnections: true,
   connectionLimit: 40,
