@@ -1,13 +1,17 @@
 const mysql = require('mysql2');
 const dotenv = require("dotenv");
+
+HOST=process.env.HOST,
+USER=process.env.USER,
+PASS=process.env.PASS,
+database=process.env.db_QA,
 dotenv.config();
 // Configuración del pool de conexiones
 const pool = mysql.createPool({
-  host: "10.200.5.37",
-  user: 'usr_financiero',
-  password: "?n-mR6%}`S`Qr(et<6",
-  database: 'indicadoresFinQA',
-  timezone: 'America/Santiago',
+  host: HOST,
+  user: USER,
+  password: PASS,
+  database: database,
   waitForConnections: true,
   connectionLimit: 40,
   queueLimit: 0,

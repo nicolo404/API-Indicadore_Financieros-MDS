@@ -1,4 +1,3 @@
-const {conexionDB} = require('./database/db-mongoDB'); 
 const express = require('express');
 const routeCarga = require('./Routes/Route-carga'); 
 const {getConnection} = require('./database/db_sql');
@@ -31,6 +30,6 @@ getConnection().then(() => {
 });
 
 
-// executeCargaDia();
+executeCargaDia();
 
 

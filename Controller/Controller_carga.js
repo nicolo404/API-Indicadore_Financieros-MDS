@@ -42,6 +42,8 @@ class Controller_carga_dia_sql {
                             resolve(result);
                         } else if (result.length == 0) {
                             console.log("Agregando: " + cargaDia.tipoIndicador + " en la fecha: " + cargaDia.fecha);
+                            // Guardar en la tabla de valores diarios
+                            await new Promise((resolve, reject) => {
                             Tbl_ValoresDiarios.create(cargaDia, (err, result) => {
                                 if (err) {
                                     console.log("Error al Guardar Carga Dia ")
@@ -50,6 +52,7 @@ class Controller_carga_dia_sql {
                                 } else {
                                     resolve(result);
                                 }
+                            });
                             });
                             //crear SAP
                             for(let k = 0; k < MaxID_SAP[0]["MAX(id_db)"]; k++){

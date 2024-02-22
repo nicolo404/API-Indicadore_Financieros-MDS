@@ -1,5 +1,7 @@
 const axios = require('axios');
 const https = require('https');
+const dotenv = require('dotenv');
+dotenv.config();
 const Tbl_ValoresDiarios = require('../Model/Model-carga_dia');
 
 const bases_datosGet = async (req,res) => {
@@ -55,7 +57,6 @@ const cargar_SAP = async (req,res) => {
                 console.log(cargasPendientesById[j]);
                 verificarIndicadorSAP(cargasPendientesById[j].fecha,cargasPendientesById[j].tipoIndicador,cargasPendientesById[j].valorIndicador, id_db,cookies);
             }
-
             
         } catch (error) {
             console.log("Error al realizar la solicitud POST para iniciar sesión en la base de datos: "+id_db);
@@ -64,7 +65,7 @@ const cargar_SAP = async (req,res) => {
     }
 }
 // URL del endpoint de inicio de sesión
-const loginEndpoint = 'https://mds-thno-s014:50000/b1s/v1/Login';
+const loginEndpoint = process.env.SAP_LOGIN_ENDPOINT;
 // Variable para almacenar las cookies
 let cookies = [];
 // Configuración de Axios
@@ -90,7 +91,7 @@ const loginSap = async (loginData, id_db) => {
 const verificarIndicadorSAP = async (fecha, tipoIndicador, valor, id_db, cookies) => {
     // Traer los valores diarios pendientes
     try {
-        const endpointVerificar = 'https://mds-thno-s014:50000/b1s/v1/SBOBobService_GetCurrencyRate';
+        const endpointVerificar = process.env.SAP_VERIFICAR_INDICADOR_ENDPOINT;
             //guardar la fecha y el tipo de indicador
             // formatear la fecha a formato SAP y el indicador a formato SAP
             const fechaSAP = fechaFormatoSAP(fecha);
@@ -137,7 +138,7 @@ const insertarMonedasSAP = (tipoMoneda,fecha,valor, id_db, cookies) => {
         };
         console.log(postData);
         // Realizar la solicitud POST para insertar postData en la base de datos
-            axios.post('https://mds-thno-s014:50000/b1s/v1/SBOBobService_SetCurrencyRate', postData, {
+            axios.post(process.env.SAP_INSERTAR_ENDPOINT , postData, {
                 httpsAgent: new https.Agent({ rejectUnauthorized: false }),
                 headers: {
                     Cookie: cookies
