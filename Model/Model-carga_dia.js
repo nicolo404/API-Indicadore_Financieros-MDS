@@ -40,9 +40,10 @@ class Tbl_ValoresDiarios {
       callback(error, null);
     });
   }
-  setEstadoCargaDia(id, estado, callback) {
+  // cambiar el estado de la tabla SAP a cargado where id_db, tipoIndicador, fecha
+  setEstadoCargaDia(id_db, tipoIndicador, fecha, callback) {
     getConnection().then((connection) => {
-      connection.query('UPDATE SAP SET Estado = ? WHERE id_SAP = ?', [estado, id], (err, result) => {
+      connection.query('UPDATE SAP SET Estado = "Cargado" WHERE id_db = ? AND tipoIndicador = ? AND fecha = ?', [id_db, tipoIndicador, fecha], (err, result) => {
         connection.release();
         callback(err, result);
       });
@@ -87,6 +88,20 @@ class Tbl_ValoresDiarios {
   getSAPbyIDDB(id_db, callback) {
     getConnection().then((connection) => {
       connection.query('SELECT S.Estado , S.id_db, S.tipoIndicador, S.fecha , V.valorIndicador , D.NombreDb , D.UserName, D.Password  FROM SAP S, DBSAP D, ValoresDiarios V WHERE S.Estado = "Pendiente" AND S.id_db = D.id_db AND S.id_db = ? AND V.fecha = S.fecha AND V.tipoIndicador = S.tipoIndicador ', id_db, (err, result) => {
+        connection.release();
+        callback(err, result);
+      });
+    }).catch((error) => {
+      if (error.connection) {
+        error.connection.release();
+      }
+      callback(error, null);
+    });
+  }
+  // traer EL maX id_sap de la tabla DBSAP
+  MaxID_SAP(callback) {
+    getConnection().then((connection) => {
+      connection.query('SELECT MAX(id_db) FROM DBSAP', (err, result) => {
         connection.release();
         callback(err, result);
       });

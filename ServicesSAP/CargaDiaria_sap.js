@@ -32,32 +32,37 @@ const cargar_SAP = async (req,res) => {
     //traer las bases de datos de sap de la funcion bases_datosGet
     const base_datos = await bases_datosGet();
     //recorrer las bases de datos
-    console.log(base_datos.length)
     for(let i = 0; i < base_datos.length; i++){
         const id_db = base_datos[i].id_db;
-        //consultar por pendientes por cada base de datos
-        const cargasPendientesById = await obtenerCargasPendientes(id_db);
-        console.log("cargas pendientes por id "+id_db+" : "+cargasPendientesById.length);
-        
-        // for para crear un json para logearse  por cada id_db
-        for(let j = 0; j < cargasPendientesById.length; j++){
-            const loginData = {
-                CompanyDB: cargasPendientesById[j].NombreDb,
-                UserName: cargasPendientesById[j].UserName,
-                Password: cargasPendientesById[j].Password
-            };
-            console.log(loginData);
-        
-            loginSap(loginData)
-            //URL del endpoint de verificar
-            const verificarEndpoint = '';
-            //verificarIndicadorSAP(cookies, fecha, tipoIndicador,id_db)
-        }
-       
+        //Logearse con los datos de la bd id_db, si es correcto consultar por pendientes por cada base de datos
+        const loginData = {
+            CompanyDB: base_datos[i].NombreDb,
+            UserName: base_datos[i].UserName,
+            Password: base_datos[i].Password
+        };
+        console.log(loginData);
+        try {
+            // Realizar la solicitud POST para iniciar sesión
+            const response = await axios.post(loginEndpoint, loginData, axiosConfig);
+            // Obtener las cookies del encabezado de la respuesta
+            cookies = response.headers['set-cookie'];
+            console.log("Inicio de sesión exitoso en la base de datos: "+id_db);
+            //consultar por las cargas pendientes de esta base de datos
+            const cargasPendientesById = await obtenerCargasPendientes(id_db);
+            console.log("cargas pendientes por id "+id_db+" : "+cargasPendientesById.length);
+            //recorrer las cargas pendientes y validar si existen en SAP services
+            for(let j = 0; j < cargasPendientesById.length; j++){
+                console.log(cargasPendientesById[j]);
+                verificarIndicadorSAP(cargasPendientesById[j].fecha,cargasPendientesById[j].tipoIndicador,cargasPendientesById[j].valorIndicador, id_db,cookies);
+            }
+
+            
+        } catch (error) {
+            console.log("Error al realizar la solicitud POST para iniciar sesión en la base de datos: "+id_db);
+            console.error("Error:", error.message);
+        } 
     }
 }
-
-
 // URL del endpoint de inicio de sesión
 const loginEndpoint = 'https://mds-thno-s014:50000/b1s/v1/Login';
 // Variable para almacenar las cookies
@@ -67,37 +72,31 @@ const axiosConfig = {
     httpsAgent: new https.Agent({ rejectUnauthorized: false }),
 };
 // Función para realizar la solicitud POST para iniciar sesión
-const loginSap = async (loginData) => {
+const loginSap = async (loginData, id_db) => {
     try {
         // Realizar la solicitud POST para iniciar sesión
         const response = await axios.post(loginEndpoint, loginData, axiosConfig);
         // Obtener las cookies del encabezado de la respuesta
         cookies = response.headers['set-cookie'];
-        // Realizar la solicitud POST con las cookies en el encabezado
-        // Ahora puedes continuar con el resto de tu lógica después de obtener la lista
-        // verificarIndicadorSAP(cookies);
-        console.log("Inicio de sesión exitoso"); 
+        console.log("Inicio de sesión exitoso en la base de datos: "+id_db);
+        
+        //verificarIndicadorSAP();
     } catch (error) {
-        console.log("Error al realizar la solicitud POST para iniciar sesión");
+        console.log("Error al realizar la solicitud POST para iniciar sesión en la base de datos: "+id_db);
         console.error("Error:", error.message);
     }
 };
 // Función para realizar la solicitud POST para verificar el indicador
-const verificarIndicadorSAP = async () => {
+const verificarIndicadorSAP = async (fecha, tipoIndicador, valor, id_db, cookies) => {
     // Traer los valores diarios pendientes
     try {
         const endpointVerificar = 'https://mds-thno-s014:50000/b1s/v1/SBOBobService_GetCurrencyRate';
-        const cargasPendientes = await obtenerCargasPendientes();
-        for(let i = 0; i < cargasPendientes.length; i++){
             //guardar la fecha y el tipo de indicador
-            const fecha = cargasPendientes[i].fecha;
-            const tipoIndicador = cargasPendientes[i].tipoIndicador;
-            const valor = cargasPendientes[i].valorIndicador;
             // formatear la fecha a formato SAP y el indicador a formato SAP
             const fechaSAP = fechaFormatoSAP(fecha);
             const tipoIndicadorSAP = monedaFormatoSAP(tipoIndicador);
             const valorSAP = valorFormatoSAP(valor);
-            const idSAP = cargasPendientes[i].id_SAP;
+            
             // Crear el JSON con la información del indicador
             const postData = {
                 Currency: tipoIndicadorSAP,
@@ -120,20 +119,16 @@ const verificarIndicadorSAP = async () => {
                     console.log("Valores ingresados no son validos para la moneda: ");
                 }
                 if(error.response.status == 400 && error.response.data.error.message.value == "Update the exchange rate"){
-                    console.log("indicador: "+tipoIndicadorSAP+" no existe en la fecha: "+fechaSAP+" en la base de datos de SAP");
-                    //insertar valor, fecha y moneda en la tabla SAP
-                    //antes de insertar cambiar formato de la moneda 
-                    insertarMonedasSAP(tipoIndicadorSAP,fechaSAP,valorSAP, idSAP);
+                    console.log("indicador: "+tipoIndicadorSAP+" no existe en la fecha: "+fechaSAP+" en la base de datos de SAP (hay que agregar)");
+                    insertarMonedasSAP(tipoIndicadorSAP,fechaSAP,valorSAP, id_db, cookies);
                 }
             });
-        }
-        console.log("Carga de datos exitosa");
     } catch (error) {
-        console.error("Error al obtener las cargas pendientes:", error);
+        console.error("Error al verificar las cargas pendientes:", error);
     }
 };
     // Funcion para realizar el post de insertar monedas en la tabla SAP de donde me logie
-const insertarMonedasSAP = (tipoMoneda,fecha,valor, idSAP) => {
+const insertarMonedasSAP = (tipoMoneda,fecha,valor, id_db, cookies) => {
     // crear el json con la informacion de la moneda
         const postData = {
             Currency: tipoMoneda,
@@ -148,12 +143,13 @@ const insertarMonedasSAP = (tipoMoneda,fecha,valor, idSAP) => {
                     Cookie: cookies
                 }
             })
-            .then(response => {
+            .then(() => {
                 // Manejar la respuesta de la operación POST
+                console.log("Moneda insertada en la base de datos de SAP");
                 
             }).then(() => {
-                //actualizar estado de la carga
-                Tbl_ValoresDiarios.setEstadoCargaDia(idSAP, "Cargado", (err, result) => {
+                //actualizar estado de la carga en la tabla SAP
+                Tbl_ValoresDiarios.setEstadoCargaDia(id_db, monedaFormatoSAP(tipoMoneda), fecha, (err, result) => {
                     if (err) {
                         console.error(err);
                     }
@@ -183,10 +179,12 @@ const monedaFormatoSAP = (moneda) => {
             return 'US$';
         case 'UFs':
             return 'UF';
-        case 'IPCs':
-            return 'ipc';
-        case 'UTMs':
-            return 'utm';
+        case 'EUR':
+            return 'Euros';
+        case 'US$':
+            return 'Dolares';
+        case 'UF':
+            return 'UFs';
         default:
             return '';
     }

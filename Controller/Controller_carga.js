@@ -7,6 +7,18 @@ class Controller_carga_dia_sql {
         };
         const informacionObtenida = await obtenerCargaDia();
         try {
+            // almacenar el maximo id_SAP
+            const MaxID_SAP = await new Promise((resolve, reject) => {
+                Tbl_ValoresDiarios.MaxID_SAP(async (err, result) => {
+                    if (err) {
+                        console.log("Error al obtener ultimo ID_SAP")
+                        console.error(err);
+                        reject(err);
+                    } else {
+                        resolve(result);
+                    }
+                });
+            });
             // Recorrer el arreglo de indicadores
             for (let i = 0; i < indicadoresCarga.length; i++) {
 
@@ -40,7 +52,7 @@ class Controller_carga_dia_sql {
                                 }
                             });
                             //crear SAP
-                            for(let k = 0; k < 9; k++){
+                            for(let k = 0; k < MaxID_SAP[0]["MAX(id_db)"]; k++){
                                 const nuevoSAP = {
                                     fecha: cargaDia.fecha,
                                     tipoIndicador: cargaDia.tipoIndicador,
