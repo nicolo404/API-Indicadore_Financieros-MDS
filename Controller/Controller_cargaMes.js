@@ -74,7 +74,7 @@ class ControllerCargaMes {
                             resolve(false)
                         }
                         else {
-                            console.log("Ya existe el indicador en la fecha: "+jsonCargaMes.fecha);
+                            console.log("Ya existe el indicador: "+jsonCargaMes.tipoIndicador+" en la fecha: "+jsonCargaMes.fecha);
                             resolve(true);   
                         }
                     });

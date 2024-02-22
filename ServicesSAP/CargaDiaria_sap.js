@@ -110,10 +110,20 @@ const verificarIndicadorSAP = async (fecha, tipoIndicador, valor, id_db, cookies
                     Cookie: cookies
                 }
             })
-            .then(response => {
+            .then(async (response) => {
                 // Manejar la respuesta de la operación POST
                 console.log(`${postData.Currency} en la fecha ${postData.Date} existe en la base de datos:`);
                 console.log(response.data);
+                await new Promise((resolve, reject) => {
+                Tbl_ValoresDiarios.setEstadoCargaDia(id_db, tipoIndicador , fechaSAP, (err, result) => {
+                    if (err) {
+                        console.error(err);
+                        console.error("Error al actualizar el estado de la carga en la base de datos de SAP");
+                    }
+                    console.log("Estado de la carga actualizado en la base de datos de SAP");
+                    resolve(result)
+                });
+                });
             }) 
             .catch(error => {
                 if(error.response.data.error.message.value == "Invalid currency"){
@@ -148,12 +158,14 @@ const insertarMonedasSAP = (tipoMoneda,fecha,valor, id_db, cookies) => {
                 // Manejar la respuesta de la operación POST
                 console.log("Moneda insertada en la base de datos de SAP");
                 
-            }).then(() => {
+            }).then( async () => {
                 //actualizar estado de la carga en la tabla SAP
+                await new Promise((resolve, reject) => {
                 Tbl_ValoresDiarios.setEstadoCargaDia(id_db, monedaFormatoSAP(tipoMoneda), fecha, (err, result) => {
                     if (err) {
                         console.error(err);
                     }
+                });
                 });
             })
             .catch(error => {
