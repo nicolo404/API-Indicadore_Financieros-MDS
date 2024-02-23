@@ -48,6 +48,8 @@ class ControllerCargaMes {
                                 });
                             //carga en SAP
                             for(let k = 0; k < MaxID_SAP[0]["MAX(id_db)"]; k++){
+                            //agregar if para que si es ipc o utm no se agregue a SAP
+                            if(jsonCargaAnual.tipoIndicador != "IPCs" || jsonCargaAnual.tipoIndicador != "UTM"){
                                 const nuevoSAP = {
                                     fecha: jsonCargaAnual.fecha,
                                     tipoIndicador: jsonCargaAnual.tipoIndicador,
@@ -66,10 +68,11 @@ class ControllerCargaMes {
                                     })
                                 });
                             }
+                        }
                             resolve(false);
                         }
                         else {
-                            console.log("Ya existe el indicador en la fecha: "+jsonCargaAnual.fecha);
+                            console.log("Ya existe el indicador"+jsonCargaAnual.tipoIndicador +"en la fecha: "+jsonCargaAnual.fecha);
                             resolve(true);   
                         }
                     });
@@ -78,7 +81,8 @@ class ControllerCargaMes {
         }catch (error) {
         }
     }
-    console.log("Carga Anual Realizada en tabla ValoresAnual y SAP 📂📈💵💸");
+    console.log("Carga Anual Realizada en tabla ValoresAnual y SAP 📂📈💵");
+    res.send("Carga Anual Realizada en tabla ValoresAnual y SAP 📂📈");
 }
 }
 module.exports = new ControllerCargaMes();

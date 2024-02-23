@@ -47,6 +47,8 @@ class ControllerCargaMes {
                             });
                             // Insertar en SAP
                             for(let k = 0; k < MaxID_SAP[0]["MAX(id_db)"]; k++){
+                                //agregar if para que si es ipc o utm no se agregue a SAP
+                                if(jsonCargaMes.tipoIndicador != "IPCs" || jsonCargaMes.tipoIndicador != "UTM"){
                                 const nuevoSAP = {
                                     fecha: jsonCargaMes.fecha,
                                     tipoIndicador: jsonCargaMes.tipoIndicador,
@@ -65,6 +67,7 @@ class ControllerCargaMes {
                                     })
                                 });
                             }
+                        }
                             resolve(false)
                         }
                         else {

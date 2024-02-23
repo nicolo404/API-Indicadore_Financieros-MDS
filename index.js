@@ -1,7 +1,7 @@
 const express = require('express');
 const routeCarga = require('./Routes/Route-carga'); 
 const {getConnection} = require('./database/db_sql');
-const {loginSap, verificarIndicadorSAP} = require('./ServicesSAP/CargaDiaria_sap');
+const {cargar_SAP} = require('./ServicesSAP/CargaDiaria_sap');
 const {executeCargaDia} = require('./Controller/Controller_carga');
 const cron = require('node-cron'); 
 const app = express();
@@ -29,7 +29,24 @@ getConnection().then(() => {
   console.error('Error al conectar a la base de datos:', error);
 });
 
+//cron carga diaria de datos
+cron.schedule('* * * * *', async () => {
+  try {
+      // Ejecutar el método executeCargaDia del controlador
+      await executeCargaDia();
 
-executeCargaDia();
+      console.log('Cron job ejecutado con éxito.');
+  } catch (error) {
+      console.error('Error al ejecutar el cron job:', error);
+  }
+});
 
-
+cron.schedule('*/2 * * * *', async () => {
+  try {
+      // Realizar el login en SAP y subida de valores
+      await cargar_SAP();
+      console.log('Cron job Login ejecutado con exito');
+  } catch (error) {
+      console.error('Error al ejecutar el cron job:', error);
+  }
+});

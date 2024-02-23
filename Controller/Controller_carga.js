@@ -56,6 +56,8 @@ class Controller_carga_dia_sql {
                             });
                             //crear SAP
                             for(let k = 0; k < MaxID_SAP[0]["MAX(id_db)"]; k++){
+                                //agregar if para que si es ipc o utm no se agregue a SAP
+                                if(cargaDia.tipoIndicador != "IPCs" || cargaDia.tipoIndicador != "UTM"){
                                 const nuevoSAP = {
                                     fecha: cargaDia.fecha,
                                     tipoIndicador: cargaDia.tipoIndicador,
@@ -74,6 +76,7 @@ class Controller_carga_dia_sql {
                                     })
                                 });
                             }
+                        }
                             resolve(result);
                         }
                     });
