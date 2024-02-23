@@ -3,8 +3,7 @@ const Tbl_ValoresDiarios = require('../Model/Model-carga_dia');
 
 class ControllerCargaMes {
     async postCargaMes(req, res) { 
-
-    // almacenar el maximo id_SAP
+    // almacenar el maximo id_db (cantidad de bases de datos)
     const MaxID_SAP = await new Promise((resolve, reject) => {
         Tbl_ValoresDiarios.MaxID_SAP(async (err, result) => {
             if (err) {
@@ -16,16 +15,11 @@ class ControllerCargaMes {
             }
         });
     });    
-
     for(let i = 0; i < req.informacionObtenida.length; i++) {
         const nombreJson = Object.keys(req.informacionObtenida[i])[0];
         //otro for por cada moneda
         try {
             for(let j = 0; j < req.informacionObtenida[i][nombreJson].length; j++) { 
-                console.log(j)
-                
-                console.log("jsonCargaMes: ");
-
                 const jsonCargaMes = {
                     fecha: req.informacionObtenida[i][nombreJson][j].Fecha,
                     tipoIndicador: nombreJson,
@@ -81,14 +75,10 @@ class ControllerCargaMes {
                 });  
             }
             
-        }catch (error) {
-            
+        }catch (error) {        
         }
     }
     res.send("ok");
 }
-
 }
 module.exports = new ControllerCargaMes();
-
-       

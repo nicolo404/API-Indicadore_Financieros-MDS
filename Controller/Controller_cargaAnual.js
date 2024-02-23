@@ -2,7 +2,7 @@ const Tbl_ValoresDiarios = require('../Model/Model-carga_dia');
 
 class ControllerCargaMes {
     async postCargaAnual(req, res) { 
-    // almacenar el maximo id_SAP
+    // almacenar el maximo id_db (cantidad de bases de datos)
     const MaxID_SAP = await new Promise((resolve, reject) => {
         Tbl_ValoresDiarios.MaxID_SAP(async (err, result) => {
             if (err) {
@@ -14,12 +14,9 @@ class ControllerCargaMes {
             }
         });
     }); 
-
     for(let i = 0; i < req.informacionObtenida.length; i++) {
         const nombreJson = Object.keys(req.informacionObtenida[i])[0];
         //otro for por cada moneda
-        console.log(nombreJson);
-        console.log(req.informacionObtenida[i][nombreJson].length); 
         try {
             for(let j = 0; j < req.informacionObtenida[i][nombreJson].length; j++) { 
                 // crear json con los datos de la moneda
@@ -49,7 +46,6 @@ class ControllerCargaMes {
                                     }
                                 });
                                 });
-
                             //carga en SAP
                             for(let k = 0; k < MaxID_SAP[0]["MAX(id_db)"]; k++){
                                 const nuevoSAP = {
@@ -71,7 +67,6 @@ class ControllerCargaMes {
                                 });
                             }
                             resolve(false);
-                           
                         }
                         else {
                             console.log("Ya existe el indicador en la fecha: "+jsonCargaAnual.fecha);
@@ -86,5 +81,4 @@ class ControllerCargaMes {
     console.log("Carga Anual Realizada en tabla ValoresAnual y SAP 📂📈💵💸");
 }
 }
-
 module.exports = new ControllerCargaMes();
