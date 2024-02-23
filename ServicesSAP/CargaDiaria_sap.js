@@ -170,10 +170,7 @@ const insertarMonedasSAP = (tipoMoneda,fecha,valor, id_db, cookies) => {
                 console.error(error.response.status);
                 console.error(error.response.data.error.message.value);
             });
-}
-
-
-
+};
 // Funcion para pasar de '2024-01-31T00:00:00.000Z' a '20240131'
 const fechaFormatoSAP = (fecha) => {
     return fecha.toISOString().split('T')[0].replace(/-/g, '');
@@ -197,6 +194,10 @@ const monedaFormatoSAP = (moneda) => {
             return 'Dolares';
         case 'UF':
             return 'UFs';
+        case 'IPCs':
+            return 'IPC';
+        case 'UTMs':
+            return 'UTM';
         default:
             return '';
     }

@@ -17,7 +17,7 @@ const obtenerCargaMes = async (req, res, next) => {
       let indicadores = [];  
       for (let i = 0; i < indicadoresCarga.length; i++) {
         console.log("Obteniendo información de: "+indicadoresCarga[i]+"...")
-            const respuesta = await axios.get(`https://api.sbif.cl/api-sbifv3/recursos_api/${indicadoresCarga[i].toLowerCase()}/${añoCarga}/${mesCarga}?apikey=${process.env.API_KEY}&formato=json`);   
+            const respuesta = await axios.get(`${process.env.URL_CARGA_SBIF}/${indicadoresCarga[i].toLowerCase()}/${añoCarga}/${mesCarga}?apikey=${process.env.API_KEY}&formato=json`);   
             // Guardar la respuesta en el objeto req
             indicadores.push(respuesta.data);
             }

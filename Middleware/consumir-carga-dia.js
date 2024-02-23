@@ -14,7 +14,7 @@ const obtenerCargaDia = async () => {
         // Realizar una solicitud GET por cada indicador de la carga
         let indicadores = [];
         for (let i = 0; i < indicadoresCarga.length; i++) {
-            const respuesta = await axios.get(`https://api.sbif.cl/api-sbifv3/recursos_api/${indicadoresCarga[i].toLowerCase()}?apikey=${process.env.API_KEY}&formato=json`);
+            const respuesta = await axios.get(`${process.env.URL_CARGA_SBIF}/${indicadoresCarga[i].toLowerCase()}?apikey=${process.env.API_KEY}&formato=json`);
             // Guardar la respuesta en un array
             indicadores.push(respuesta.data);
         }
