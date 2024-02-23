@@ -40,7 +40,6 @@ cron.schedule('* * * * *', async () => {
       console.error('Error al ejecutar el cron job:', error);
   }
 });
-
 cron.schedule('*/2 * * * *', async () => {
   try {
       // Realizar el login en SAP y subida de valores
