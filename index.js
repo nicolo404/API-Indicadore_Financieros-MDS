@@ -29,8 +29,8 @@ getConnection().then(() => {
   console.error('Error al conectar a la base de datos:', error);
 });
 
-//cron carga diaria de datos
-cron.schedule('* * * * *', async () => {
+//cron carga diaria de datos a las 00:00
+cron.schedule('0 0 * * *', async () => {
   try {
       // Ejecutar el método executeCargaDia del controlador
       await executeCargaDia();
@@ -40,7 +40,21 @@ cron.schedule('* * * * *', async () => {
       console.error('Error al ejecutar el cron job:', error);
   }
 });
-cron.schedule('*/2 * * * *', async () => {
+
+//cron carga de datos una vez al mes a las 00:00
+cron.schedule('0 0 1 * *', async () => {
+  try {
+      // Ejecutar el método executeCargaDia del controlador
+      await executeCargaDia();
+
+      console.log('Cron job ejecutado con éxito.');
+  } catch (error) {
+      console.error('Error al ejecutar el cron job:', error);
+  }
+});
+
+//login en sap todos los dias a las 02:00
+cron.schedule('*0 2 * * *', async () => {
   try {
       // Realizar el login en SAP y subida de valores
       await cargar_SAP();
