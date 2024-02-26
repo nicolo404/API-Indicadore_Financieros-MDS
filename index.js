@@ -54,7 +54,7 @@ cron.schedule('0 0 1 * *', async () => {
 });
 
 //login en sap todos los dias a las 02:00
-cron.schedule('*0 2 * * *', async () => {
+cron.schedule('0 2 * * *', async () => {
   try {
       // Realizar el login en SAP y subida de valores
       await cargar_SAP();
