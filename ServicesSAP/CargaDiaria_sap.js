@@ -35,11 +35,13 @@ const cargar_SAP = async (req,res) => {
     //recorrer las bases de datos
     for(let i = 0; i < base_datos.length; i++){
         const id_db = base_datos[i].id_db;
+        //decodificar la contraseña que viene en base64
+        const decodedPassword = Buffer.from(base_datos[i].Password, 'base64').toString('utf-8');
         //Logearse con los datos de la bd id_db, si es correcto consultar por pendientes por cada base de datos
         const loginData = {
             CompanyDB: base_datos[i].NombreDb,
             UserName: base_datos[i].UserName,
-            Password: base_datos[i].Password
+            Password: decodedPassword
         };
         try {
             // Realizar la solicitud POST para iniciar sesión

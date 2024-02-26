@@ -72,7 +72,7 @@ class Tbl_ValoresDiarios {
   // consulta para traer todas las filas de la tabla DBSAP
   getAllDBSAP(callback) {
     getConnection().then((connection) => {
-      connection.query('SELECT * FROM DBSAP', (err, result) => {
+      connection.query('SELECT * FROM DBSAP ', (err, result) => {
         connection.release();
         callback(err, result);
       });
@@ -98,7 +98,7 @@ class Tbl_ValoresDiarios {
       callback(error, null);
     });
   }
-  // traer EL maX id_sap de la tabla DBSAP
+  // traer EL maximo valor id_sap de la tabla DBSAP
   MaxID_SAP(callback) {
     getConnection().then((connection) => {
       connection.query('SELECT MAX(id_db) FROM DBSAP', (err, result) => {
