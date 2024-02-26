@@ -8,7 +8,6 @@ const tbl_valoremesController = require('../Controller/Controller_cargaMes');
 const tbl_valoresanualController = require('../Controller/Controller_cargaAnual');
 const sap = require('../ServicesSAP/CargaDiaria_sap');
 
-router.post('/v1/cargaDiaActual', obtenerCargaDia, tbl_valoresdiariosController.postCargaDia);
 router.post('/v1/cargaMes', obtenerCargaMes,tbl_valoremesController.postCargaMes);
 router.post('/v1/cargaAnual', obtenerCargaAnual,tbl_valoresanualController.postCargaAnual);
 
