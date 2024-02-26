@@ -1,10 +1,10 @@
 const mysql = require('mysql2');
 const dotenv = require("dotenv");
 
-HOST=process.env.HOST,
-USER=process.env.USER,
-PASS=process.env.PASS,
-database=process.env.db_QA,
+HOST=process.env.DB_HOST,
+USER=process.env.DB_USER,
+PASS=process.env.DB_PASS,
+database=process.env.DB_NAME,
 dotenv.config();
 // Configuración del pool de conexiones
 const pool = mysql.createPool({

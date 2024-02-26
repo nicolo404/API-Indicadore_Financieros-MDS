@@ -64,6 +64,7 @@ const cargar_SAP = async (req,res) => {
         } 
     }
     console.log("Carga de pendientes finalizada");
+    res.status(200).json({message: "Carga de pendientes finalizada"});
 }
 // URL del endpoint de inicio de sesión
 const loginEndpoint = process.env.SAP_LOGIN_ENDPOINT;
