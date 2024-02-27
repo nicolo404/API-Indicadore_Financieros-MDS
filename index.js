@@ -18,7 +18,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 // routes
 app.use("/api", routeCarga);
-
 // Configurar el servidor y conectar a la base de datos
 getConnection().then(() => {
   // Iniciar el servidor
@@ -28,7 +27,6 @@ getConnection().then(() => {
 }).catch((error) => {
   console.error('Error al conectar a la base de datos:', error);
 });
-
 //cron carga diaria de datos a las 00:00
 cron.schedule('0 0 * * *', async () => {
   try {
@@ -40,13 +38,12 @@ cron.schedule('0 0 * * *', async () => {
       console.error('Error al ejecutar el cron job:', error);
   }
 });
-
 //login en sap todos los dias a las 02:00
 cron.schedule('0 2 * * *', async () => {
   try {
       // Realizar el login en SAP y subida de valores
       await cargar_SAP();
-      console.log('Cron job Login ejecutado con exito');
+      console.log('Cron job Agregar indicadores a SAP ejecutado con exito');
   } catch (error) {
       console.error('Error al ejecutar el cron job:', error);
   }

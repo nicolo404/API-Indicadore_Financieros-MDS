@@ -1,6 +1,7 @@
 const axios = require('axios');
 const https = require('https');
 const dotenv = require('dotenv');
+const { json } = require('body-parser');
 dotenv.config();
 const Tbl_ValoresDiarios = require('../Model/Model-carga_dia');
 
@@ -54,7 +55,6 @@ const cargar_SAP = async (req,res) => {
             console.log("cargas pendientes por id "+id_db+" : "+cargasPendientesById.length);
             //recorrer las cargas pendientes y validar si existen en SAP services
             for(let j = 0; j < cargasPendientesById.length; j++){
-                console.log(cargasPendientesById[j]);
                 await verificarIndicadorSAP(cargasPendientesById[j].fecha,cargasPendientesById[j].tipoIndicador,cargasPendientesById[j].valorIndicador, id_db,cookies);
             }
             
@@ -63,8 +63,10 @@ const cargar_SAP = async (req,res) => {
             console.error("Error:", error.message);
         } 
     }
+    if(res){
+        return res.status(200).send({ mensaje: "Carga de pendientes finalizada" });
+    }
     console.log("Carga de pendientes finalizada");
-    res.status(200).json({message: "Carga de pendientes finalizada"});
 }
 // URL del endpoint de inicio de sesión
 const loginEndpoint = process.env.SAP_LOGIN_ENDPOINT;
@@ -111,7 +113,6 @@ const verificarIndicadorSAP = async (fecha, tipoIndicador, valor, id_db, cookies
             .then(async (response) => {
                 // Manejar la respuesta de la operación POST de validar el indicador
                 console.log(`${postData.Currency} en la fecha ${postData.Date} existe en la base de datos:`);
-                console.log(response.data);
                 //actualizar estado de la carga en la tabla SAP a Estado = Cargado
                 await new Promise((resolve, reject) => {
                 Tbl_ValoresDiarios.setEstadoCargaDia(id_db, tipoIndicador , fechaSAP, (err, result) => {
@@ -119,7 +120,6 @@ const verificarIndicadorSAP = async (fecha, tipoIndicador, valor, id_db, cookies
                         console.error(err);
                         console.error("Error al actualizar el estado de la carga en la base de datos de SAP");
                     }
-                    console.log("Estado de la carga actualizado en la base de datos de SAP");
                     resolve(result)
                 });
                 });
@@ -129,7 +129,7 @@ const verificarIndicadorSAP = async (fecha, tipoIndicador, valor, id_db, cookies
                     console.log("Valores ingresados no son validos para la moneda: ");
                 }
                 if(error.response.status == 400 && error.response.data.error.message.value == "Update the exchange rate"){
-                    console.log("indicador: "+tipoIndicadorSAP+" no existe en la fecha: "+fechaSAP+" en la base de datos de SAP (hay que agregar)");
+                    console.log("indicador: "+tipoIndicadorSAP+" no existe en la fecha: "+fechaSAP+" en la base de datos de SAP");
                     insertarMonedasSAP(tipoIndicadorSAP,fechaSAP,valorSAP, id_db, cookies);
                 }
             });
@@ -145,7 +145,6 @@ const insertarMonedasSAP = (tipoMoneda,fecha,valor, id_db, cookies) => {
             RateDate: fecha,
             Rate: valor
         };
-        console.log(postData);
         // Realizar la solicitud POST para insertar postData en la base de datos
             axios.post(process.env.SAP_INSERTAR_ENDPOINT , postData, {
                 httpsAgent: new https.Agent({ rejectUnauthorized: false }),

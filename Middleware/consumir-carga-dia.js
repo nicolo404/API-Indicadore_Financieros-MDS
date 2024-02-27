@@ -1,7 +1,6 @@
 const axios = require('axios');
 const dotenv = require('dotenv');
 dotenv.config();
-
 // Middleware que realiza una solicitud GET a otra ruta
 const obtenerCargaDia = async () => {
     const { indicadoresCarga } = {
@@ -9,7 +8,6 @@ const obtenerCargaDia = async () => {
             "DolaR", "uF", "EuRO"
         ]
     };
-
     try {
         // Realizar una solicitud GET por cada indicador de la carga
         let indicadores = [];
@@ -24,5 +22,4 @@ const obtenerCargaDia = async () => {
         throw error;
     }
 };
-
 module.exports = { obtenerCargaDia };
